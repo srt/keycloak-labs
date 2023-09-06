@@ -1,0 +1,67 @@
+---
+version: "3.9"
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    command: start
+    environment:
+      KC_HOSTNAME_URL: https://keycloak.traefik.me/
+      KC_PROXY: edge
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.keycloak.rule=Host(`keycloak.traefik.me`)"
+      - "traefik.http.routers.keycloak.tls=true"
+      - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
+      - "traefik.http.services.keycloak.loadbalancer.server.scheme=http"
+    networks:
+      web:
+  traefik:
+    image: "traefik:v2.10.4"
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.traefik.me`)"
+      - "traefik.http.routers.traefik.tls=true"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+    volumes:
+      - ./certs:/etc/ssl/traefik
+      - ./traefik/tls.yml:/etc/traefik/tls.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    command:
+      - "--log.level=DEBUG"
+      - "--accesslog"
+      - "--api"
+      - "--api.dashboard"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.file.filename=/etc/traefik/tls.yml"
+      - "--entrypoints.http.address=:80"
+      - "--entrypoints.https.address=:443"
+      - "--entrypoints.http.http.redirections.entryPoint.to=https"
+      - "--entrypoints.http.http.redirections.entryPoint.scheme=https"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      web:
+        aliases:
+          - keycloak.traefik.me
+    depends_on:
+      cert-helper:
+        condition: service_completed_successfully
+  cert-helper:
+    image: alpine:3.18
+    working_dir: /certs
+    command:  |
+        sh -c "
+        (test -f cert.pem || wget traefik.me/cert.pem -nc -O cert.pem) &&
+        (test -f privkey.pem || wget traefik.me/privkey.pem -nc -O privkey.pem) "
+    volumes:
+      - ./certs:/certs
+networks:
+  web:
