@@ -30,7 +30,7 @@ services:
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
     volumes:
       - ./certs:/etc/ssl/traefik
-      - ./traefik/tls.yml:/etc/traefik/tls.yml
+      - ./tls.yml:/etc/traefik/tls.yml
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command:
       - "--log.level=DEBUG"
