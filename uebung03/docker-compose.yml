@@ -6,6 +6,10 @@ services:
     restart: unless-stopped
     command: start
     environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://db/keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: supersecretpassword
       KC_HOSTNAME_URL: https://keycloak.traefik.me/
       KC_PROXY: edge
       KEYCLOAK_ADMIN: admin
@@ -17,8 +21,12 @@ services:
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
       - "traefik.http.services.keycloak.loadbalancer.server.scheme=http"
     networks:
+      db:
       mail:
       web:
+    depends_on:
+      cert-helper:
+        condition: service_completed_successfully
   traefik:
     image: "traefik:v2.10.4"
     restart: unless-stopped
@@ -69,6 +77,14 @@ services:
     networks:
       mail:
       web:
+  db:
+    image: postgres:15.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: supersecretpassword
+    networks:
+      db:
   cert-helper:
     image: alpine:3.18
     working_dir: /certs
@@ -79,5 +95,6 @@ services:
     volumes:
       - ./certs:/certs
 networks:
+  db:
   mail:
   web:
