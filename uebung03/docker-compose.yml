@@ -20,13 +20,9 @@ services:
       - "traefik.http.routers.keycloak.tls=true"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
       - "traefik.http.services.keycloak.loadbalancer.server.scheme=http"
-    networks:
-      db:
-      mail:
-      web:
     depends_on:
-      cert-helper:
-        condition: service_completed_successfully
+      db:
+        condition: service_started
   traefik:
     image: "traefik:v2.10.4"
     restart: unless-stopped
@@ -50,7 +46,6 @@ services:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=web"
       - "--providers.file.filename=/etc/traefik/tls.yml"
       - "--entrypoints.http.address=:80"
       - "--entrypoints.https.address=:443"
@@ -59,7 +54,7 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     networks:
-      web:
+      default:
         aliases:
           - keycloak.traefik.me
     depends_on:
@@ -74,17 +69,14 @@ services:
       - "traefik.http.routers.mailcatcher.tls=true"
       - "traefik.http.services.mailcatcher.loadbalancer.server.port=1080"
       - "traefik.http.services.mailcatcher.loadbalancer.server.scheme=http"
-    networks:
-      mail:
-      web:
   db:
     image: postgres:15.4
     restart: unless-stopped
     environment:
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: supersecretpassword
-    networks:
-      db:
+    volumes:
+      - ./db:/var/lib/postgresql/data
   cert-helper:
     image: alpine:3.18
     working_dir: /certs
@@ -94,7 +86,3 @@ services:
         (test -f privkey.pem || wget traefik.me/privkey.pem -nc -O privkey.pem) "
     volumes:
       - ./certs:/certs
-networks:
-  db:
-  mail:
-  web:
