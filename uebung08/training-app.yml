@@ -3,11 +3,10 @@ services:
     image: stefanreuter/training-app
     environment:
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KC_CLIENTID: training-app
-      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KC_CLIENTSECRET: PXFcwRIhrwIpeepRgKWHXj1sdzax0cVj
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KC_CLIENTSECRET: __changeme__
       SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KC_SCOPE: openid, profile
       SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KC_ISSUERURI: https://keycloak.traefik.me/realms/training
       SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KC_USERNAMEATTRIBUTE: preferred_username
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUERURI: https://keycloak.traefik.me/realms/training
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.wordpress.rule=Host(`training.traefik.me`)"
