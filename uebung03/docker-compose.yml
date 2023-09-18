@@ -4,7 +4,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:22.0.3
     restart: unless-stopped
-    command: start
+    command: start --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     environment:
       KC_DB: postgres
       KC_DB_URL: jdbc:postgresql://db/keycloak
@@ -20,6 +20,9 @@ services:
       - "traefik.http.routers.keycloak.tls=true"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
       - "traefik.http.services.keycloak.loadbalancer.server.scheme=http"
+    volumes:
+      - "./import:/opt/keycloak/data/import"
+      - "./themes:/opt/keycloak/themes"
     depends_on:
       db:
         condition: service_started
@@ -76,7 +79,7 @@ services:
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: supersecretpassword
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - "./db:/var/lib/postgresql/data"
   cert-helper:
     image: alpine:3.18
     working_dir: /certs
