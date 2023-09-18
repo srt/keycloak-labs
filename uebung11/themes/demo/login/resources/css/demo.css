@@ -5,3 +5,10 @@
 #kc-header-wrapper {
   font-size: 99px;
 }
+
+.login-pf body {
+    background: url("https://images.unsplash.com/photo-1693773024865-d2623880567d")
+      no-repeat center center fixed;
+    background-size: cover;
+    height: 100%;
+}
