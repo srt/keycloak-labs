@@ -2,7 +2,7 @@
 version: "3.9"
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:22.0.3
+    image: quay.io/keycloak/keycloak:23.0.4
     restart: unless-stopped
     command: start --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     environment:
@@ -27,7 +27,7 @@ services:
       db:
         condition: service_started
   traefik:
-    image: traefik:v2.10.4
+    image: traefik:v2.10.7
     restart: unless-stopped
     ports:
       - "80:80"
@@ -73,7 +73,7 @@ services:
       - "traefik.http.services.mailcatcher.loadbalancer.server.port=1080"
       - "traefik.http.services.mailcatcher.loadbalancer.server.scheme=http"
   db:
-    image: postgres:15.4
+    image: postgres:16.1
     restart: unless-stopped
     environment:
       POSTGRES_USER: keycloak
@@ -89,3 +89,8 @@ services:
         (test -f privkey.pem || wget traefik.me/privkey.pem -nc -O privkey.pem) "
     volumes:
       - ./certs:/certs
+  hoppscotch:
+    image: hoppscotch/hoppscotch:2023.12.2
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.hoppscotch.rule=Host(`hoppscotch.traefik.me`)"
