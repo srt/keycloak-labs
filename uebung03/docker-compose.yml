@@ -88,8 +88,3 @@ services:
         (test -f privkey.pem || wget traefik.me/privkey.pem -nc -O privkey.pem) "
     volumes:
       - ./certs:/certs
-  hoppscotch:
-    image: hoppscotch/hoppscotch:2023.12.2
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.hoppscotch.rule=Host(`hoppscotch.traefik.me`)"
