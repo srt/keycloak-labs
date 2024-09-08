@@ -5,8 +5,9 @@ services:
     restart: unless-stopped
     command: start
     environment:
-      KC_HOSTNAME_URL: https://keycloak.traefik.me/
-      KC_PROXY: edge
+      KC_HOSTNAME: https://keycloak.traefik.me/
+      KC_HTTP_ENABLED: true
+      KC_PROXY_HEADERS: xforwarded
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     labels:
@@ -16,7 +17,7 @@ services:
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
       - "traefik.http.services.keycloak.loadbalancer.server.scheme=http"
   traefik:
-    image: traefik:v3.0.0
+    image: traefik:v3.1.2
     restart: unless-stopped
     ports:
       - "80:80"
