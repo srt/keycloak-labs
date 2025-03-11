@@ -1,7 +1,7 @@
 ---
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:26.0.2
+    image: quay.io/keycloak/keycloak:26.1.3
     restart: unless-stopped
     command: start --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     environment:
@@ -27,7 +27,7 @@ services:
       db:
         condition: service_started
   traefik:
-    image: traefik:v3.1.2
+    image: traefik:v3.3.4
     restart: unless-stopped
     ports:
       - "80:80"
@@ -63,6 +63,23 @@ services:
     depends_on:
       cert-helper:
         condition: service_completed_successfully
+  db:
+    image: postgres:17.4
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: supersecretpassword
+    volumes:
+      - "./db:/var/lib/postgresql/data"
+  cert-helper:
+    image: alpine:3.21
+    working_dir: /certs
+    command:  |
+        sh -c "
+        (test -f cert.pem || wget traefik.me/fullchain.pem -nc -O cert.pem) &&
+        (test -f privkey.pem || wget traefik.me/privkey.pem -nc -O privkey.pem) "
+    volumes:
+      - ./certs:/certs
   mailcatcher:
     image: sj26/mailcatcher:v0.9.0
     restart: unless-stopped
@@ -72,20 +89,11 @@ services:
       - "traefik.http.routers.mailcatcher.tls=true"
       - "traefik.http.services.mailcatcher.loadbalancer.server.port=1080"
       - "traefik.http.services.mailcatcher.loadbalancer.server.scheme=http"
-  db:
-    image: postgres:16.1
+  ad:
+    image: smblds/smblds
     restart: unless-stopped
     environment:
-      POSTGRES_USER: keycloak
-      POSTGRES_PASSWORD: supersecretpassword
-    volumes:
-      - "./db:/var/lib/postgresql/data"
-  cert-helper:
-    image: alpine:3.18
-    working_dir: /certs
-    command:  |
-        sh -c "
-        (test -f cert.pem || wget traefik.me/fullchain.pem -nc -O cert.pem) &&
-        (test -f privkey.pem || wget traefik.me/privkey.pem -nc -O privkey.pem) "
-    volumes:
-      - ./certs:/certs
+      INSECURE_LDAP: "true"
+    ports:
+      - "389:389"
+      - "636:636"
