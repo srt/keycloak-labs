@@ -89,11 +89,24 @@ services:
       - "traefik.http.routers.mailcatcher.tls=true"
       - "traefik.http.services.mailcatcher.loadbalancer.server.port=1080"
       - "traefik.http.services.mailcatcher.loadbalancer.server.scheme=http"
-  ad:
+  ad1:
     image: smblds/smblds
     restart: unless-stopped
     environment:
       INSECURE_LDAP: "true"
+      REALM: AD1.EXAMPLE.COM
+      DOMAIN: AD1
     ports:
       - "389:389"
       - "636:636"
+    volumes:
+      - ./ad1-entrypoint.d:/entrypoint.d
+  ad2:
+    image: smblds/smblds
+    restart: unless-stopped
+    environment:
+      INSECURE_LDAP: "true"
+      REALM: AD2.EXAMPLE.COM
+      DOMAIN: AD2
+    volumes:
+      - ./ad2-entrypoint.d:/entrypoint.d
