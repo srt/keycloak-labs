@@ -69,15 +69,6 @@ services:
       POSTGRES_PASSWORD: supersecretpassword
     volumes:
       - "./db:/var/lib/postgresql"
-  cert-helper:
-    image: alpine:3.21
-    working_dir: /certs
-    command:  |
-        sh -c "
-        (test -f cert.pem || wget traefik.me/fullchain.pem -nc -O cert.pem) &&
-        (test -f privkey.pem || wget traefik.me/privkey.pem -nc -O privkey.pem) "
-    volumes:
-      - ./certs:/certs
   mailcatcher:
     image: sj26/mailcatcher:v0.10.0
     restart: unless-stopped
