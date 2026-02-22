@@ -1,7 +1,7 @@
 ---
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:26.5.3
+    image: quay.io/keycloak/keycloak:26.5.4
     restart: unless-stopped
     command: start --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     environment:
@@ -9,14 +9,14 @@ services:
       KC_DB_URL: jdbc:postgresql://db/keycloak
       KC_DB_USERNAME: keycloak
       KC_DB_PASSWORD: supersecretpassword
-      KC_HOSTNAME: https://keycloak.traefik.me/
+      KC_HOSTNAME: https://${KEYCLOAK_HOST}/
       KC_HTTP_ENABLED: true
       KC_PROXY_HEADERS: xforwarded
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.keycloak.rule=Host(`keycloak.traefik.me`)"
+      - "traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_HOST}`)"
       - "traefik.http.routers.keycloak.tls=true"
       - "traefik.http.services.keycloak.loadbalancer.server.port=8080"
       - "traefik.http.services.keycloak.loadbalancer.server.scheme=http"
@@ -34,7 +34,7 @@ services:
       - "443:443"
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.traefik.rule=Host(`traefik.traefik.me`)"
+      - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_HOST}`)"
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
     volumes:
       - ./certs:/etc/ssl/traefik
@@ -56,10 +56,7 @@ services:
     networks:
       default:
         aliases:
-          - keycloak.traefik.me
-    depends_on:
-      cert-helper:
-        condition: service_completed_successfully
+          - "${KEYCLOAK_HOST}"
   db:
     image: postgres:18.2
     restart: unless-stopped
@@ -74,7 +71,7 @@ services:
     restart: unless-stopped
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mailcatcher.rule=Host(`mailcatcher.traefik.me`)"
+      - "traefik.http.routers.mailcatcher.rule=Host(`${MAILCATCHER_HOST}`)"
       - "traefik.http.services.mailcatcher.loadbalancer.server.port=1080"
       - "traefik.http.services.mailcatcher.loadbalancer.server.scheme=http"
   ad1:
