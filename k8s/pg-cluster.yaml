@@ -1,0 +1,26 @@
+---
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: keycloak-db
+  namespace: keycloak
+spec:
+  instances: 3
+  storage:
+    size: 1Gi
+    storageClass: local-path
+  postgresql:
+    parameters:
+      max_connections: "20"
+      shared_buffers: "256MB"
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: keycloak-db
+  namespace: keycloak
+spec:
+  selector:
+    matchLabels:
+      cnpg.io/cluster: keycloak-db
+  podMetricsEndpoints:
+  - port: metrics

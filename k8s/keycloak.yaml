@@ -1,0 +1,25 @@
+apiVersion: k8s.keycloak.org/v2alpha1
+kind: Keycloak
+metadata:
+  name: keycloak
+  namespace: keycloak
+spec:
+  db:
+    vendor: postgres
+  instances: 3
+  additionalOptions:
+    - name: db.url
+      secret:
+        name: keycloak-db-app
+        key: jdbc-uri
+    - name: metrics-enabled
+      value: "true"
+    - name: http-metrics-histograms-enabled
+      value: "true"
+  http:
+#    tlsSecret: example-tls-secret
+    httpEnabled: true
+  hostname:
+    hostname: keycloak.example.com
+  proxy:
+    headers: xforwarded
