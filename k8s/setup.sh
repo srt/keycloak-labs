@@ -1,4 +1,4 @@
-KEYCLOAK_VERSION="26.5.4"
+KEYCLOAK_VERSION="26.5.6"
 
 echo ""
 echo "🔐 Installing Keycloak via operator..."

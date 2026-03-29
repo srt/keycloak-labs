@@ -1,7 +1,7 @@
 ---
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:26.5.4
+    image: quay.io/keycloak/keycloak:26.5.6
     restart: unless-stopped
     command: start --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     environment:
@@ -37,7 +37,7 @@ services:
       - "traefik.http.routers.traefik.rule=Host(`${TRAEFIK_HOST}`)"
       - "traefik.http.services.traefik.loadbalancer.server.port=8080"
     volumes:
-      - ./certs:/etc/ssl/traefik
+      - ../uebung02/certs:/etc/ssl/traefik
       - ./tls.yml:/etc/traefik/tls.yml
       - /var/run/docker.sock:/var/run/docker.sock:ro
     command:
