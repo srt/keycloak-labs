@@ -1,7 +1,7 @@
 ---
 services:
   keycloak:
-    image: quay.io/keycloak/keycloak:26.5.6
+    image: quay.io/keycloak/keycloak:26.8.1
     restart: unless-stopped
     command: start --spi-theme-static-max-age=-1 --spi-theme-cache-themes=false --spi-theme-cache-templates=false
     environment:
@@ -12,8 +12,8 @@ services:
       KC_HOSTNAME: https://${KEYCLOAK_HOST}/
       KC_HTTP_ENABLED: true
       KC_PROXY_HEADERS: xforwarded
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.keycloak.rule=Host(`${KEYCLOAK_HOST}`)"
