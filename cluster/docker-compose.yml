@@ -86,4 +86,4 @@ services:
       POSTGRES_USER: keycloak
       POSTGRES_PASSWORD: supersecretpassword
     volumes:
-      - ./db:/var/lib/postgresql/data
+      - ./db:/var/lib/postgresql
