@@ -1,7 +1,7 @@
 #!/bin/bash
 set -eu
 
-# SERVER_HOSTNAME="studentXX.example.com"
+SERVER_HOSTNAME="$(hostname -s).keycloak.trion-training.de"
 
 echo "Generating certificate for ${SERVER_HOSTNAME} 📜"
 echo
