@@ -1,0 +1,33 @@
+---
+# Keycloak im Dev-Mode mit allen Erweiterungen aus diesem Projekt (zum Ausprobieren und Debuggen)
+#   Bauen:   mvn package -DskipTests   (oder ohne lokales JDK: docker compose run --rm build)
+#   Starten: docker compose up -d      → http://localhost:8080 (admin / admin)
+#   Debuggen: in der IDE "Remote JVM Debug" auf localhost:8787 verbinden
+#   Nach jedem Neubau: docker compose restart keycloak (kein Hot-Reload)
+name: keycloak-dev
+services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.8.2
+    command: start-dev --import-realm --spi-password-policy--hibp--api-url=https://api.pwnedpasswords.com/range/
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_LOG_LEVEL: info,de.trion:debug
+      # Theme-Änderungen ohne Neustart sehen (nur Entwicklung!)
+      KC_SPI_THEME__CACHE_THEMES: "false"
+      KC_SPI_THEME__CACHE_TEMPLATES: "false"
+      JAVA_OPTS_APPEND: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8787
+    ports:
+      - "${KC_PORT:-8080}:8080"
+      - "127.0.0.1:${KC_DEBUG_PORT:-8787}:8787"
+    volumes:
+      - ./target/keycloak-extensions.jar:/opt/keycloak/providers/keycloak-extensions.jar
+      - ./import:/opt/keycloak/data/import
+  build:
+    image: maven:3.9.11-eclipse-temurin-21
+    profiles: ["build"]
+    working_dir: /src
+    command: mvn -B package -DskipTests
+    volumes:
+      - .:/src
+      - ~/.m2:/root/.m2
