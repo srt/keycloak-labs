@@ -5,7 +5,7 @@
 # import/demo-realm.json wird von diesem Skript erzeugt und mit eingecheckt (Start per "docker compose up"
 # ohne weitere Schritte). Änderungen am Realm hier vornehmen, nicht in der JSON-Datei.
 # Neu erzeugen, ohne einen laufenden Keycloak zu stören:
-#   mvn package -DskipTests
+#   ./mvnw package -DskipTests
 #   export COMPOSE_PROJECT_NAME=realm-gen KC_PORT=18080 KC_DEBUG_PORT=18787
 #   docker compose up -d keycloak && ./setup-realm.sh [mit-flow] && docker compose down
 #

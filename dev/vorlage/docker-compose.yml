@@ -1,6 +1,6 @@
 ---
 # Keycloak im Dev-Mode mit allen Erweiterungen aus diesem Projekt (zum Ausprobieren und Debuggen)
-#   Bauen:   mvn package -DskipTests   (oder ohne lokales JDK: docker compose run --rm build)
+#   Bauen:   ./mvnw package -DskipTests   (oder ohne lokales JDK: docker compose run --rm build)
 #   Starten: docker compose up -d      → http://localhost:8080 (admin / admin)
 #   Debuggen: in der IDE "Remote JVM Debug" auf localhost:8787 verbinden
 #   Nach jedem Neubau: docker compose restart keycloak (kein Hot-Reload)
@@ -24,10 +24,10 @@ services:
       - ./target/keycloak-extensions.jar:/opt/keycloak/providers/keycloak-extensions.jar
       - ./import:/opt/keycloak/data/import
   build:
-    image: maven:3.9.11-eclipse-temurin-21
+    image: eclipse-temurin:21-jdk
     profiles: ["build"]
     working_dir: /src
-    command: mvn -B package -DskipTests
+    command: ./mvnw -B package -DskipTests
     volumes:
       - .:/src
       - ~/.m2:/root/.m2

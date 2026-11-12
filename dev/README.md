@@ -13,20 +13,21 @@ Ein Maven-Projekt für alle Entwicklungs-Übungen, je Thema ein Package:
 
 Vorgehen (test-driven): Zum Start einer Übung in deren Testklassen die Zeile `@Disabled` entfernen →
 Tests laufen lassen (rot) → implementieren, bis sie grün sind. Fertige Übungen bleiben grün, noch nicht
-begonnene werden übersprungen – `mvn verify` und `mvn package` funktionieren also in jedem Zwischenstand.
+begonnene werden übersprungen – `./mvnw verify` und `./mvnw package` funktionieren also in jedem Zwischenstand.
 
 ## Tests ausführen
 
-Voraussetzung: JDK 21+, Maven 3.9+. Der erste Lauf lädt Keycloak (Test Framework) herunter.
+Voraussetzung: JDK 21+. Maven muss nicht installiert sein: der Maven Wrapper (`./mvnw`, unter Windows `mvnw.cmd`)
+lädt beim ersten Aufruf Maven 3.9.11 herunter. Der erste Testlauf lädt außerdem Keycloak (Test Framework).
 
 ```bash
-mvn test      # nur Unit-Tests (Sekunden, ohne Keycloak)
-mvn verify    # zusätzlich die Integrationstests mit Keycloak
+./mvnw test      # nur Unit-Tests (Sekunden, ohne Keycloak)
+./mvnw verify    # zusätzlich die Integrationstests mit Keycloak
 ```
 
 Einzelne Tests lassen sich direkt in der IDE starten.
 
-- **Unit-Tests** (`*Test`, Surefire): reine Logik, keine Keycloak-Abhängigkeit, laufen bei `mvn test`.
+- **Unit-Tests** (`*Test`, Surefire): reine Logik, keine Keycloak-Abhängigkeit, laufen bei `./mvnw test`.
 - **Integrationstests** (`*IT`, Failsafe): das [Keycloak Test Framework](https://github.com/keycloak/keycloak/tree/main/test-framework)
   startet einen echten Keycloak mit den Klassen aus `target/classes` (`dependencyCurrentProject()`),
   legt Realm, Benutzer und Client je Test an und räumt danach auf. Konfiguration: `ExtensionsServerConfig`.
@@ -51,7 +52,7 @@ Alternativ lassen sich die Variablen in einer Datei `.env.test` im Projektverzei
 ## Keycloak mit den Erweiterungen von Hand starten
 
 ```bash
-mvn package -DskipTests
+./mvnw package -DskipTests
 docker compose up -d              # http://localhost:8080, admin / admin, Realm "demo"
 docker compose restart keycloak   # nach jedem Neubau
 ```
@@ -66,7 +67,7 @@ docker compose restart keycloak   # nach jedem Neubau
 - Änderungen am Realm im Skript vornehmen, **nicht in der JSON-Datei**, und die Datei danach neu erzeugen.
   Ohne Konflikt mit einem laufenden Keycloak:
   ```bash
-  mvn package -DskipTests
+  ./mvnw package -DskipTests
   export COMPOSE_PROJECT_NAME=realm-gen KC_PORT=18080 KC_DEBUG_PORT=18787
   docker compose up -d keycloak && ./setup-realm.sh mit-flow && docker compose down
   ```
